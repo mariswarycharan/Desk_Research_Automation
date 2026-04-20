@@ -7,7 +7,66 @@ client = Client(
 )
 
 
-with open("xlsx_to_txt_content.txt", "r", encoding="utf-8") as file:
+
+# =====================================================
+# PURE PYTHON TOKEN COUNTER (NO EXTERNAL LIBRARIES)
+# Approximate token count for DeepSeek / GPT / LLMs
+# =====================================================
+
+import re
+import math
+
+
+def estimate_tokens(text):
+    """
+    Approximate token count using Python logic only.
+
+    Rule:
+    - English words ≈ 0.75 tokens per word
+    - Punctuation counted separately
+    - Numbers counted separately
+    - Spaces ignored
+    """
+
+    # Split words / punctuation / numbers
+    parts = re.findall(r"\w+|[^\w\s]", text, re.UNICODE)
+
+    token_count = 0
+
+    for item in parts:
+
+        # If number
+        if item.isdigit():
+            token_count += 1
+
+        # If punctuation
+        elif len(item) == 1 and not item.isalnum():
+            token_count += 1
+
+        # If word
+        else:
+            # Approximation:
+            # 1 token for every 4 characters
+            token_count += math.ceil(len(item) / 4)
+
+    return token_count
+
+
+def analyze_text(text):
+    words = len(text.split())
+    chars = len(text)
+    tokens = estimate_tokens(text)
+
+    print("=" * 60)
+    print("PURE PYTHON TOKEN ESTIMATION")
+    print("=" * 60)
+    print(f"Characters : {chars}")
+    print(f"Words      : {words}")
+    print(f"Tokens     : {tokens}")
+    print("=" * 60)
+
+
+with open("txts/xlsx_to_txt_content.txt", "r", encoding="utf-8") as file:
     research_content = file.read()
 
 
@@ -70,6 +129,10 @@ STRICT CONTENT RULES:
 5. Summarize dense data into executive-ready concise insights.
 6. Ensure logical storytelling flow across slides.
 7. Maintain continuity between slides.
+CONTENT IMPACT RULES:
+1. Create strong, executive-style slide titles that are catchy, meaningful, insight-led, and immediately valuable to the client. Every title should clearly reflect the slide message and create interest.
+2. Slide content must be concise, impactful, and professionally written so that each point adds value, communicates insight, and creates a positive impression while reading.
+3. Tables, charts, and visuals must also communicate clear business meaning, using smart labels, structured formatting, and attractive presentation that strengthens the overall client impact.
 
 DECK STRUCTURE:
 Automatically create an optimal storyline and table of contents based on input data.
@@ -97,6 +160,7 @@ Recommended flow:
 You may adapt structure depending on available input data.
 
 SLIDE DESIGN RULES:
+1. Use bolded word for title and heading text and make it in blue colour and keep font size as 20.
 1. Premium consulting / strategy firm quality.
 2. Clean white-space usage.
 3. Strong visual hierarchy.
@@ -139,9 +203,6 @@ This is mandatory.
 For every research-backed statement included in slides:
 
 Example:
-Market grew by 12% YoY [1]
-France reimbursement reforms accelerated adoption [2]
-
 At the bottom of each slide, include references used in that slide in single text box and one by one pointer wise:
 
 [1] https://source-link-1.com
@@ -219,7 +280,15 @@ messages = [
   },
 ]
 
+# count tokens in prompt
+analyze_text(pptx_prompt)
+
+# deepseek-v3.2:cloud
+
 r = client.chat('deepseek-v3.1:671b-cloud', messages=messages)
 
-print(r['message']['content'], end='', flush=True)
+final_response = r['message']['content']
+
+with open("generated_pptx_code.py", "w", encoding="utf-8") as file:
+    file.write(final_response)
 

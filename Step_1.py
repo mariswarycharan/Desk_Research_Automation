@@ -157,7 +157,6 @@ OUTPUT RULES:
 
 JSON STRUCTURE:
 {{
-
 "Source Title": "Give suitable title of the source document or webpage",
 "Name of the Source": "Give suitable name of the publication or website",
 "Source Type": "Give suitable Report, News, Policy, Market Data, etc.",
