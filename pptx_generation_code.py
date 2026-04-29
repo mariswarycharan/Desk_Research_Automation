@@ -81,7 +81,7 @@ You are a Senior PowerPoint Automation Specialist and Python python-pptx Code Ge
 
 Your responsibility is to generate a complete, production-ready, error-free Python script using the python-pptx library that creates a highly professional client-facing research presentation deck.
 
-INPUT RESEARCH DATA:
+INPUT RESEARCH DATA CONTENT:
 {research_content}
 
 
@@ -117,18 +117,17 @@ The input dataset may contain rows/records with fields such as:
 You must analyze the full provided input content and convert it into a polished executive presentation.
 
 CORE OBJECTIVE:
-Generate Python code only using python-pptx that builds a complete PowerPoint deck (15 - 20 slides) using this template file:
-
-Use the template theme, layout style, formatting logic, and branding across all generated slides.
+Generate Python code only using python-pptx that builds a complete PowerPoint deck (15 - 20 slides):
 
 STRICT CONTENT RULES:
 1. Every factual statement in slides must come only from the provided research input.
 2. Do not invent facts, statistics, claims, company names, or numbers.
 3. If some information is not available, intelligently omit it.
 4. Use professional consulting-style language.
-5. Summarize dense data into executive-ready concise insights.
 6. Ensure logical storytelling flow across slides.
 7. Maintain continuity between slides.
+
+
 CONTENT IMPACT RULES:
 1. Create strong, executive-style slide titles that are catchy, meaningful, insight-led, and immediately valuable to the client. Every title should clearly reflect the slide message and create interest.
 2. Slide content must be concise, impactful, and professionally written so that each point adds value, communicates insight, and creates a positive impression while reading.
@@ -160,7 +159,7 @@ Recommended flow:
 You may adapt structure depending on available input data.
 
 SLIDE DESIGN RULES:
-1. Use bolded word for title and heading text and make it in blue colour and keep font size as 20.
+1. Use bolded word for title and heading text and make it in blue colour and keep font size as 16.
 1. Premium consulting / strategy firm quality.
 2. Clean white-space usage.
 3. Strong visual hierarchy.
@@ -169,9 +168,7 @@ SLIDE DESIGN RULES:
 6. Use italic selectively.
 7. Proper text alignment.
 8. Use justified body text where suitable.
-9. Consistent spacing.
 10. Use structured content boxes.
-11. Use smart section dividers.
 12. Use visually balanced layouts.
 13. No emojis.
 
@@ -188,7 +185,7 @@ Where relevant, generate and include:
 - Heatmaps (if feasible)
 - Trend summaries
 
-Use only data available in input.
+IMPORTANT: Use only data available in input research content.
 
 IMAGES / LOGOS:
 If relevant to companies, countries, sectors, or themes:
@@ -232,9 +229,20 @@ If metrics exist:
 - Ensure readability
 
 
-IMPORTANT:
+IMPORTANT INSTRUCTIONS:
 - You must want to include tabular data presentation in atleast 2 - 3 slides.
 - You must want to include charts, visuals, in the atleast 2 - 3 slides , to create visual you can use matplotlib, seaborn, plotly kind of libraries and include code for it in the final code output
+
+1. Content quality is very important for every slide. Include as much relevant content as possible while keeping it properly aligned and well-structured.
+
+2. Avoid slides with very little content. Maintain a balanced, high level of content on each slide.
+
+3. Ensure each slide contains essential and meaningful information relevant to its title.
+
+4. Important points must be included in every slide so that the presentation looks professional, informative, and engaging for the reader.
+
+5. Bullet points should be used for all content in all slides.
+
 
 
 CODE GENERATION RULES:
@@ -284,8 +292,9 @@ messages = [
 analyze_text(pptx_prompt)
 
 # deepseek-v3.2:cloud
+# deepseek-v4-pro:cloud
 
-r = client.chat('deepseek-v3.1:671b-cloud', messages=messages)
+r = client.chat('deepseek-v3.1:671b-cloud', messages=messages, think='high')
 
 final_response = r['message']['content']
 

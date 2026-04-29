@@ -13,7 +13,7 @@ from docx import Document
 from pptx import Presentation
 from ollama import Client
 
-MODEL = "gpt-oss:120b"
+MODEL = "deepseek-v3.1:671b-cloud"
 client = Client(
     host="https://ollama.com",
     headers={'Authorization': 'Bearer dd456319486541c5bfd8dfd001136b32.krWKOjU-1cHaHoKQr0iQDe0r'}
@@ -120,13 +120,24 @@ async def extract_content(source: str) -> str | None:
 
 # topic declaration
 topic_1 = "Access_Reimbursement"
-topic_1_description = ""
+topic_1_description = """
+Extract information related to market access, reimbursement policies, insurance coverage, public or private payer support, pricing approvals, and patient affordability. Include evidence on funding pathways, inclusion in healthcare schemes, tender access, and barriers to diagnosis adoption due to cost or reimbursement limitations.
+"""
+
 topic_2 = "Budget_Spend"
-topic_2_description = ""
+topic_2_description = """
+Extract information related to healthcare spending, diagnostic budgets, procurement investments, hospital or laboratory expenditure, government allocations, and funding trends or costs , money, Include data on purchasing capacity, capital investment, cost pressures, and budget priorities influencing IVD adoption.
+"""
+
 topic_3 = "Regulatory"
-topic_3_description = ""
+topic_3_description = """
+Extract information related to regulatory approvals, compliance requirements, certification pathways, import/export rules, quality standards, and market authorization processes. Include updates on IVDR, CE marking, local regulations, policy changes, and barriers impacting market entry.
+"""
+
 topic_4 = "Customer_Receptivity"
-topic_4_description = ""
+topic_4_description = """
+Extract information related to customer acceptance, clinician adoption, laboratory demand, distributor interest, brand perception, purchasing behavior, and stakeholder readiness. Include evidence on preferences for new technologies, trust in suppliers, unmet needs, and willingness to switch or adopt Chinese IVD products.
+"""
 
 
 def build_prompt(text: str, research_topic: str, research_domain: str, focus_entities: str) -> str:
@@ -134,7 +145,7 @@ def build_prompt(text: str, research_topic: str, research_domain: str, focus_ent
     Builds a dynamic system+user prompt suited for any research context.
     All research parameters are injected at runtime.
     """
-    safe_text = text[:28000]
+    safe_text = text
 
     return f"""
 You are a Senior Research Intelligence Analyst. Your task is to extract structured evidence from a source document for the following research context:
@@ -143,12 +154,33 @@ You are a Senior Research Intelligence Analyst. Your task is to extract structur
 - Research Topic   : {research_topic}
 - Focus Entities   : {focus_entities}
 
+-----
+
+INPUT SOURCE CONTENT (Extracted text from a document or webpage):
+{safe_text}
+
+-----
+
+
 Your extraction must answer these five analytical pillars where applicable:
-1. Access & Reimbursement
-2. Budget & Spend
-3. Regulatory Environment
-4. Customer / Stakeholder Receptivity
-5. Any other relevant insights
+1. {topic_1}: {topic_1_description} \n
+2. {topic_2}: {topic_2_description} \n
+3. {topic_3}: {topic_3_description} \n
+4. {topic_4}: {topic_4_description} \n
+5. Any other relevant insights \n
+
+---
+
+IMPORTANT INSTRUCTIONS:
+
+1. Do not be overly strict while extracting relevant information for each topic based on its description. If any content in the source is even slightly relevant to a topic, include it.\n
+
+2. Understand the context and meaning of each sentence carefully before extracting the information. Capture what the content is actually trying to convey.\n
+
+3. If multiple sentences or pieces of information are relevant to a particular topic, include all of them. Present them clearly as bullet points such as Point 1, Point 2, etc.\n
+
+4. Ensure no relevant information is missed while extracting the data. \n
+
 
 OUTPUT RULES:
 - Return ONLY a valid JSON object. No markdown, no preamble.
@@ -208,9 +240,6 @@ JSON STRUCTURE:
 
 "Summary": "4-5 sentence synthesis of source relevance to the research."
 }}
-
-SOURCE TEXT:
-{safe_text}
 """
 
 async def analyze_with_llm(text: str, research_topic: str, research_domain: str, focus_entities: str) -> dict | None:
@@ -381,7 +410,8 @@ if __name__ == "__main__":
     # ── CONFIGURE YOUR RUN HERE ──────────────────────────────────────────────
     SOURCES = [
         # Mix of URLs and local files — all supported
-        "https://en.caclp.com/industry-news/2365.html",
+        "https://healthcare-in-europe.com/en/news/snibe-makes-an-entry-at-euromedlab.html#:~:text=%E2%80%98Our%20exports%20to%20Europe%20focus,It%E2%80%99s%20perfectly%C2%A0suited%2C%20for%20example%2C%20for",
+
     ]
 
     RESEARCH_TOPIC = "European expansion potential of Chinese IVD suppliers"
@@ -389,7 +419,18 @@ if __name__ == "__main__":
     FOCUS_ENTITIES = "Mindray, Snibe"
     # ─────────────────────────────────────────────────────────────────────────
 
+    # # just call website extraction to test the extraction without calling the LLM
+    # web_content = asyncio.run(extract_from_website(SOURCES[0]))
 
+    # # just call only build prompt to test the prompt output without calling the LLM
+    # result = build_prompt(
+    #     text=web_content,
+    #     research_topic=RESEARCH_TOPIC,
+    #     research_domain=RESEARCH_DOMAIN,
+    #     focus_entities=FOCUS_ENTITIES
+    # )
+    # print("Generated Prompt:")
+    # print(result)
 
     asyncio.run(run_pipeline(
         sources=SOURCES,
